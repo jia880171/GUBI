@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ProDashboardReal">
+
+    <TextView
+        android:id="@+id/text_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="time"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+    <RelativeLayout
+        android:id="@+id/Relative1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_time">
+        <at.grabner.circleprogress.CircleProgressView
+            android:layout_marginTop="30dp"
+            android:id="@+id/circleProgress_lat"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerHorizontal="true"
+            app:layout_constraintLeft_toLeftOf="parent"
+
+            />
+        <TextView
+            android:id="@+id/text_lat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="lat"
+            android:layout_below="@+id/circleProgress_lat"
+            android:layout_centerHorizontal="true"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+        <at.grabner.circleprogress.CircleProgressView
+            android:layout_marginTop="30dp"
+            android:id="@+id/circleProgress_lng"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_below="@+id/text_lat"
+            android:layout_centerHorizontal="true"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+        <TextView
+            android:id="@+id/text_lng"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="lng"
+            android:layout_below="@+id/circleProgress_lng"
+            android:layout_centerHorizontal="true"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+        <TextView
+            android:id="@+id/text_latLng"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="latLng"
+            android:layout_below="@+id/text_lng"
+            android:layout_centerHorizontal="true"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+        <at.grabner.circleprogress.CircleProgressView
+            android:id="@+id/circleProgress_speed"
+            android:layout_marginTop="30dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_below="@+id/text_latLng"
+            android:layout_centerHorizontal="true"
+            app:layout_constraintLeft_toLeftOf="parent"
+
+            />
+        <TextView
+            android:id="@+id/text_speed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="speed"
+            android:layout_below="@+id/circleProgress_speed"
+            android:layout_centerHorizontal="true"
+            />
+        <TextView
+            android:id="@+id/text_degree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="degree"
+            android:layout_below="@+id/text_speed"
+            android:layout_centerHorizontal="true"
+            />
+
+    </RelativeLayout>
+
+
+
+
+
+
+
+
+</android.support.constraint.ConstraintLayout>
