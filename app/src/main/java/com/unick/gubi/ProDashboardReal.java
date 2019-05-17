@@ -33,6 +33,7 @@ import org.json.JSONObject;
 import java.util.Date;
 
 import at.grabner.circleprogress.CircleProgressView;
+import at.grabner.circleprogress.TextMode;
 
 public class ProDashboardReal extends AppCompatActivity {
 
@@ -97,11 +98,17 @@ public class ProDashboardReal extends AppCompatActivity {
         text_degree = (TextView) findViewById(R.id.text_degree);
 
         circleProgressView_lat = findViewById(R.id.circleProgress_lat);
-        setCircleProgressView(circleProgressView_lat,100,100,0,90,23);
+        circleProgressView_lat.setTextMode(TextMode.TEXT); // Set text mode to text to show text
+        setCircleProgressView(circleProgressView_lat,100,100,50,90,23);
+
         circleProgressView_lng = findViewById(R.id.circleProgress_lng);
         setCircleProgressView(circleProgressView_lng,100,100,0,180,120);
+
         circleProgressView_speed = findViewById(R.id.circleProgress_speed);
-        setCircleProgressView(circleProgressView_speed,100,100,0,200,60);
+        circleProgressView_speed.setTextMode(TextMode.TEXT);
+        circleProgressView_speed.setBlockCount(10);
+        circleProgressView_speed.setBlockScale(0.9f);
+        setCircleProgressView(circleProgressView_speed,100,100,50,200,60);
 
         //set LocationManager
         if (mLocationManager == null) {
@@ -266,7 +273,10 @@ public class ProDashboardReal extends AppCompatActivity {
                         Double dLng = Double.parseDouble(lng);
                         Double dLat = Double.parseDouble(lat);
                         circleProgressView_lng.setValue(dLng.intValue());
+
                         circleProgressView_lat.setValue(dLat.intValue());
+                        circleProgressView_lat.setText(lat);
+
                         Log.d("ProDashTest","set text by last known!");
                         text_lng.setText("Longitude: " + lng);
                         text_lat.setText("Latitude: " + lat);
@@ -293,6 +303,7 @@ public class ProDashboardReal extends AppCompatActivity {
         String stringSpeed= String.valueOf(speed.intValue());
         text_speed.setText("speed: " + stringSpeed);
         circleProgressView_speed.setValue(speed.intValue());
+        circleProgressView_speed.setText(stringSpeed);
         String stringDegree= Float.toString(degree);
         text_degree.setText(stringDegree);
 

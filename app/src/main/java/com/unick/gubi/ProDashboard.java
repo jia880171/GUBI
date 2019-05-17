@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -33,6 +34,7 @@ import org.json.JSONObject;
 import java.util.Date;
 
 import at.grabner.circleprogress.CircleProgressView;
+import at.grabner.circleprogress.TextMode;
 
 public class ProDashboard extends AppCompatActivity {
 
@@ -41,7 +43,7 @@ public class ProDashboard extends AppCompatActivity {
     private static final int speed_driving_stop = 2;
 
     private int mCount = 0;
-    private Double speed = 60.0;
+    private Double speed = 0.0;
     public int transportType = 0;
     private long timeInMilli;
 
@@ -55,6 +57,9 @@ public class ProDashboard extends AppCompatActivity {
     private CircleProgressView circleProgressView_speed;
     private CircleProgressView circleProgressView_lat;
     private CircleProgressView circleProgressView_lng;
+
+    private ProgressBar progressBar_lat;
+    private ProgressBar progressBar_lng;
 
     private StringBuilder stringBuilder_acc;
 
@@ -97,33 +102,30 @@ public class ProDashboard extends AppCompatActivity {
         text_degree = (TextView) findViewById(R.id.text_degree);
 
         circleProgressView_lat = findViewById(R.id.circleProgress_lat);
-        circleProgressView_lat.setBarWidth(100);
-        circleProgressView_lat.setRimWidth(100);
-        circleProgressView_lat.setTextSize(0);
-        circleProgressView_lat.setMaxValue(90);
-        circleProgressView_lat.setValue(23);
+        circleProgressView_lat.setTextMode(TextMode.TEXT); // Set text mode to text to show text
+        setCircleProgressView(circleProgressView_lat,100,100,50,90,23, Color.parseColor("#ffffff"));
 
         circleProgressView_lng = findViewById(R.id.circleProgress_lng);
-        circleProgressView_lng.setBarWidth(100);
-        circleProgressView_lng.setRimWidth(100);
-        circleProgressView_lng.setTextSize(0);
-        circleProgressView_lng.setMaxValue(180);
-        circleProgressView_lng.setValue(120);
-
+        setCircleProgressView(circleProgressView_lng,100,100,0,180,120, Color.parseColor("#ffffff"));
 
         circleProgressView_speed = findViewById(R.id.circleProgress_speed);
-        circleProgressView_speed.setBarWidth(100);
-        circleProgressView_speed.setRimWidth(100);
-        circleProgressView_speed.setTextSize(0);
-        circleProgressView_speed.setMaxValue(200);
-        circleProgressView_speed.setValue(60);
+        circleProgressView_speed.setTextMode(TextMode.TEXT);
+        circleProgressView_speed.setBlockCount(10);
+        circleProgressView_speed.setBlockScale(0.9f);
+        setCircleProgressView(circleProgressView_speed,100,100,100,200,60, Color.parseColor("#ffffff"));
+
+        progressBar_lat = findViewById(R.id.progressBar_lat);
+        progressBar_lat.setMax(90);
+        progressBar_lat.setProgress(23);
+
+        progressBar_lng = findViewById(R.id.progressBar_lng);
+        progressBar_lng.setMax(180);
+        progressBar_lng.setProgress(120);
 
         //set LocationManager
         if (mLocationManager == null) {
-            Log.d("ProDashTest","on create mLocationManager == null");
             mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             mLocationListener = new MyLocationListener();
-            Log.d("checking","checking permission onCreate");
             checkLocationPermission();
         }
 
@@ -134,12 +136,12 @@ public class ProDashboard extends AppCompatActivity {
         listener = new MySensorEventListener();
         sensor_manager.registerListener(listener, aSensor, SensorManager.SENSOR_DELAY_NORMAL);
         sensor_manager.registerListener(listener, mfSensor, SensorManager.SENSOR_DELAY_NORMAL);
+
         //thread for checking speed
         stringBuilder_acc = new StringBuilder();
         flagFormRun = true;
         flag_have_record = false;
         JArray = new JSONArray();
-
         new Thread(mRun = new Runnable() {
             @Override
             public void run() {
@@ -169,10 +171,11 @@ public class ProDashboard extends AppCompatActivity {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        timeInMilli = System.currentTimeMillis();
                                         SetText();
                                     }
                                 });
-                                Thread.sleep(60000);//checking rate : 1 per/min
+                                Thread.sleep(1000);//checking rate : 1 per/sec
                             }
                         }
                     }
@@ -182,6 +185,14 @@ public class ProDashboard extends AppCompatActivity {
             }
         }).start();
 
+    }
+    private void setCircleProgressView(CircleProgressView circleProgressView, int BarWidth, int RimWidth, int TextSize, int MaxValue, int Value, int TextColor){
+        circleProgressView.setBarWidth(BarWidth);
+        circleProgressView.setRimWidth(RimWidth);
+        circleProgressView.setTextSize(TextSize);
+        circleProgressView.setMaxValue(MaxValue);
+        circleProgressView.setTextColor(TextColor);
+        circleProgressView.setValue(Value);
     }
 
     private void fakeSpeed(){
@@ -200,11 +211,12 @@ public class ProDashboard extends AppCompatActivity {
     private void GPSReal() {
         if(flagForRecording ==false && speed>=speed_driving_start){
             flagForRecording =true;
-            Log.d("inService","speed >= 20, start recording!");
+            Log.d("proReal","speed >= 20, start recording!");
         } else if(flagForRecording){
-            Log.d("inService","speed = " + speed);
-            Log.d("inService","recording...");
+            Log.d("proReal","speed = " + speed);
+            Log.d("proReal","recording...");
             timeInMilli = System.currentTimeMillis();
+            Log.d("proREAL,get currentTime","time: " + timeInMilli);
             AppendJsonObject();
             SetText();
             if(speed > speed_driving_stop){
@@ -240,9 +252,9 @@ public class ProDashboard extends AppCompatActivity {
             JArray = new JSONArray();
         }
         mCount = mCount +1;
-        Log.d("ProDashTest","mCount: " + mCount);
-        Log.d("ProDashTest","transportation type" + transportType);
-        Log.d("ProDashTest","latLng: " + latLng);
+        Log.d("uploadService","mCount: " + mCount);
+        Log.d("uploadService","transportation type" + transportType);
+        Log.d("uploadService","latLng: " + latLng);
         timeInMilli = System.currentTimeMillis();
         AppendJsonObject();
     }
@@ -250,7 +262,9 @@ public class ProDashboard extends AppCompatActivity {
 
     private void SetText(){
         text_time.setText(String.valueOf(timeInMilli));
+        Log.d("proREAL","time: " + timeInMilli);
 
+        //須優化程式碼
         if(ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED){
@@ -272,7 +286,10 @@ public class ProDashboard extends AppCompatActivity {
                         Double dLng = Double.parseDouble(lng);
                         Double dLat = Double.parseDouble(lat);
                         circleProgressView_lng.setValue(dLng.intValue());
+
                         circleProgressView_lat.setValue(dLat.intValue());
+                        circleProgressView_lat.setText(lat);
+
                         Log.d("ProDashTest","set text by last known!");
                         text_lng.setText("Longitude: " + lng);
                         text_lat.setText("Latitude: " + lat);
@@ -294,13 +311,12 @@ public class ProDashboard extends AppCompatActivity {
                 text_latLng.setText("(" + lat + "," + lng + ")");
             }
         }
-        //須優化程式碼
-
 
 
         String stringSpeed= String.valueOf(speed.intValue());
         text_speed.setText("speed: " + stringSpeed);
         circleProgressView_speed.setValue(speed.intValue());
+        circleProgressView_speed.setText(stringSpeed+"KM/H");
         String stringDegree= Float.toString(degree);
         text_degree.setText(stringDegree);
 
@@ -324,32 +340,26 @@ public class ProDashboard extends AppCompatActivity {
     private class MyLocationListener implements LocationListener {
         // GPS位置資訊已更新
         public void onLocationChanged(Location location) {
-            Log.d("MyLocationListener","sense location changed!!!");
             latLng = new LatLng(location.getLatitude(),location.getLongitude());
             time = new Date(location.getTime());
             //add = GEOReverseHelper.getAddressByLatLng(latLng);
             speed = location.getSpeed()*3.6;
         }
         public void onProviderDisabled(String provider) {
-            Log.d("MyLocationListener","onProviderDisabled!!!");
         }
 
         public void onProviderEnabled(String provider) {
-            Log.d("MyLocationListener","onProviderEnabled!!!");
         }
         // GPS位置資訊的狀態被更新
         public void onStatusChanged(String provider, int status, Bundle extras) {
             switch (status) {
                 case LocationProvider.AVAILABLE:
-                    Log.d("MyLocationListener","GPSStatusChanged,服務中!!!");
                     //setTitle("服務中");
                     break;
                 case LocationProvider.OUT_OF_SERVICE:
-                    Log.d("MyLocationListener","GPSStatusChanged,沒有服務!!!");
                     //setTitle("沒有服務");
                     break;
                 case LocationProvider.TEMPORARILY_UNAVAILABLE:
-                    Log.d("MyLocationListener","GPSStatusChanged,暫時不可使用!!!");
                     //setTitle("暫時不可使用");
                     break;
             }
@@ -444,7 +454,6 @@ public class ProDashboard extends AppCompatActivity {
             }
             return false;
         } else {
-            Log.d("checking location","has permission");
             return true;
         }
     }
@@ -479,20 +488,6 @@ public class ProDashboard extends AppCompatActivity {
                 }
                 return;
             }
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        //set LocationManager
-        if (mLocationManager == null) {
-            Log.d("ProDashTest","on resume mLocationManager == null");
-            mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            mLocationListener = new MyLocationListener();
-            Log.d("checking","checking permission onResume");
-            checkLocationPermission();
-
         }
     }
 }
