@@ -13,6 +13,7 @@
             android:id="@+id/text_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="#ffffff"
             android:text="time"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -77,27 +78,6 @@
             app:layout_constraintLeft_toLeftOf="@id/progressBar_lng"
             app:layout_constraintTop_toBottomOf="@+id/progressBar_lng"
             />
-
-
-    <at.grabner.circleprogress.CircleProgressView
-        android:id="@+id/circleProgress_lat"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="4dp"
-        android:layout_marginTop="3000dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_lng"
-        />
-
-    <at.grabner.circleprogress.CircleProgressView
-        android:id="@+id/circleProgress_lng"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_centerHorizontal="true"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/circleProgress_lat"
-        />
 
         <TextView
             android:id="@+id/text_latLng"

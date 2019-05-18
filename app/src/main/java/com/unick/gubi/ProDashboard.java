@@ -55,8 +55,6 @@ public class ProDashboard extends AppCompatActivity {
     private TextView text_degree;
 
     private CircleProgressView circleProgressView_speed;
-    private CircleProgressView circleProgressView_lat;
-    private CircleProgressView circleProgressView_lng;
 
     private ProgressBar progressBar_lat;
     private ProgressBar progressBar_lng;
@@ -101,17 +99,12 @@ public class ProDashboard extends AppCompatActivity {
         text_speed = (TextView) findViewById(R.id.text_speed);
         text_degree = (TextView) findViewById(R.id.text_degree);
 
-        circleProgressView_lat = findViewById(R.id.circleProgress_lat);
-        circleProgressView_lat.setTextMode(TextMode.TEXT); // Set text mode to text to show text
-        setCircleProgressView(circleProgressView_lat,100,100,50,90,23, Color.parseColor("#ffffff"));
-
-        circleProgressView_lng = findViewById(R.id.circleProgress_lng);
-        setCircleProgressView(circleProgressView_lng,100,100,0,180,120, Color.parseColor("#ffffff"));
-
         circleProgressView_speed = findViewById(R.id.circleProgress_speed);
+        //circleProgressView_speed.setRimColor(Color.parseColor("#808080"));
+        circleProgressView_speed.setBarColor(Color.parseColor("#FF8033"));
         circleProgressView_speed.setTextMode(TextMode.TEXT);
-        circleProgressView_speed.setBlockCount(10);
-        circleProgressView_speed.setBlockScale(0.9f);
+        circleProgressView_speed.setBlockCount(15);
+        circleProgressView_speed.setBlockScale(0.93f);
         setCircleProgressView(circleProgressView_speed,100,100,100,200,60, Color.parseColor("#ffffff"));
 
         progressBar_lat = findViewById(R.id.progressBar_lat);
@@ -123,11 +116,13 @@ public class ProDashboard extends AppCompatActivity {
         progressBar_lng.setProgress(120);
 
         //set LocationManager
+        checkLocationPermission();
         if (mLocationManager == null) {
             mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            mLocationListener = new MyLocationListener();
-            checkLocationPermission();
         }
+        mLocationListener = new MyLocationListener();
+        mLocationManager.requestLocationUpdates(LM_GPS, 0, 0, mLocationListener);
+        mLocationManager.requestLocationUpdates(LM_NETWORK, 0, 0, mLocationListener);
 
         //set getOrientation
         sensor_manager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -285,11 +280,8 @@ public class ProDashboard extends AppCompatActivity {
                         String lat= Double.toString(latLng.latitude);
                         Double dLng = Double.parseDouble(lng);
                         Double dLat = Double.parseDouble(lat);
-                        circleProgressView_lng.setValue(dLng.intValue());
-
-                        circleProgressView_lat.setValue(dLat.intValue());
-                        circleProgressView_lat.setText(lat);
-
+                        progressBar_lat.setProgress(dLat.intValue());
+                        progressBar_lng.setProgress(dLng.intValue());
                         Log.d("ProDashTest","set text by last known!");
                         text_lng.setText("Longitude: " + lng);
                         text_lat.setText("Latitude: " + lat);
@@ -304,8 +296,8 @@ public class ProDashboard extends AppCompatActivity {
                 String lat= Double.toString(latLng.latitude);
                 Double dLng = Double.parseDouble(lng);
                 Double dLat = Double.parseDouble(lat);
-                circleProgressView_lng.setValue(dLng.intValue());
-                circleProgressView_lat.setValue(dLat.intValue());
+                progressBar_lat.setProgress(dLat.intValue());
+                progressBar_lng.setProgress(dLng.intValue());
                 text_lng.setText("Longitude: " + lng);
                 text_lat.setText("Latitude: " + lat);
                 text_latLng.setText("(" + lat + "," + lng + ")");
@@ -459,6 +451,19 @@ public class ProDashboard extends AppCompatActivity {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        //set LocationManager
+        checkLocationPermission();
+        if (mLocationManager == null) {
+            mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        }
+        mLocationListener = new MyLocationListener();
+        mLocationManager.requestLocationUpdates(LM_GPS, 0, 0, mLocationListener);
+        mLocationManager.requestLocationUpdates(LM_NETWORK, 0, 0, mLocationListener);
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
@@ -475,7 +480,6 @@ public class ProDashboard extends AppCompatActivity {
 
                         //Request location updates:
                         //mLocationManager.requestLocationUpdates(provider, 400, 1, this);
-
                         mLocationManager.requestLocationUpdates(LM_GPS, 0, 0, mLocationListener);
                         mLocationManager.requestLocationUpdates(LM_NETWORK, 0, 0, mLocationListener);
                     }

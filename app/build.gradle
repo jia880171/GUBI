@@ -30,4 +30,5 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:16.1.0'
 
     implementation 'com.github.jakob-grabner:Circle-Progress-View:1.4'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
 }

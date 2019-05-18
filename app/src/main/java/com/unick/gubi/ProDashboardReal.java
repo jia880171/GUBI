@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -57,6 +58,9 @@ public class ProDashboardReal extends AppCompatActivity {
     private CircleProgressView circleProgressView_lat;
     private CircleProgressView circleProgressView_lng;
 
+    private ProgressBar progressBar_lat;
+    private ProgressBar progressBar_lng;
+
     private StringBuilder stringBuilder_acc;
 
     Runnable mRun;
@@ -99,23 +103,37 @@ public class ProDashboardReal extends AppCompatActivity {
 
         circleProgressView_lat = findViewById(R.id.circleProgress_lat);
         circleProgressView_lat.setTextMode(TextMode.TEXT); // Set text mode to text to show text
-        setCircleProgressView(circleProgressView_lat,100,100,50,90,23);
+        setCircleProgressView(circleProgressView_lat,100,100,50,90,23, Color.parseColor("#ffffff"));
 
         circleProgressView_lng = findViewById(R.id.circleProgress_lng);
-        setCircleProgressView(circleProgressView_lng,100,100,0,180,120);
+        setCircleProgressView(circleProgressView_lng,100,100,0,180,120, Color.parseColor("#ffffff"));
 
         circleProgressView_speed = findViewById(R.id.circleProgress_speed);
+        circleProgressView_speed.setBarColor(Color.parseColor("#FF8033"));
         circleProgressView_speed.setTextMode(TextMode.TEXT);
         circleProgressView_speed.setBlockCount(10);
         circleProgressView_speed.setBlockScale(0.9f);
-        setCircleProgressView(circleProgressView_speed,100,100,50,200,60);
+        setCircleProgressView(circleProgressView_speed,100,100,100,200,60, Color.parseColor("#ffffff"));
+
+        progressBar_lat = findViewById(R.id.progressBar_lat);
+        progressBar_lat.setMax(90);
+        progressBar_lat.setProgress(23);
+
+        progressBar_lng = findViewById(R.id.progressBar_lng);
+        progressBar_lng.setMax(180);
+        progressBar_lng.setProgress(120);
 
         //set LocationManager
+        checkLocationPermission();
         if (mLocationManager == null) {
             mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            mLocationListener = new MyLocationListener();
-            checkLocationPermission();
         }
+        mLocationListener = new MyLocationListener();
+        mLocationManager.requestLocationUpdates(LM_GPS, 0, 0, mLocationListener);
+        mLocationManager.requestLocationUpdates(LM_NETWORK, 0, 0, mLocationListener);
+
+
+
 
         //set getOrientation
         sensor_manager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -174,11 +192,12 @@ public class ProDashboardReal extends AppCompatActivity {
         }).start();
 
     }
-    private void setCircleProgressView(CircleProgressView circleProgressView, int BarWidth, int RimWidth, int TextSize, int MaxValue, int Value){
+    private void setCircleProgressView(CircleProgressView circleProgressView, int BarWidth, int RimWidth, int TextSize, int MaxValue, int Value, int TextColor){
         circleProgressView.setBarWidth(BarWidth);
         circleProgressView.setRimWidth(RimWidth);
         circleProgressView.setTextSize(TextSize);
         circleProgressView.setMaxValue(MaxValue);
+        circleProgressView.setTextColor(TextColor);
         circleProgressView.setValue(Value);
     }
 
@@ -272,10 +291,13 @@ public class ProDashboardReal extends AppCompatActivity {
                         String lat= Double.toString(latLng.latitude);
                         Double dLng = Double.parseDouble(lng);
                         Double dLat = Double.parseDouble(lat);
-                        circleProgressView_lng.setValue(dLng.intValue());
 
+                        circleProgressView_lng.setValue(dLng.intValue());
                         circleProgressView_lat.setValue(dLat.intValue());
                         circleProgressView_lat.setText(lat);
+
+                        progressBar_lat.setProgress(dLat.intValue());
+                        progressBar_lng.setProgress(dLng.intValue());
 
                         Log.d("ProDashTest","set text by last known!");
                         text_lng.setText("Longitude: " + lng);
@@ -293,6 +315,8 @@ public class ProDashboardReal extends AppCompatActivity {
                 Double dLat = Double.parseDouble(lat);
                 circleProgressView_lng.setValue(dLng.intValue());
                 circleProgressView_lat.setValue(dLat.intValue());
+                progressBar_lat.setProgress(dLat.intValue());
+                progressBar_lng.setProgress(dLng.intValue());
                 text_lng.setText("Longitude: " + lng);
                 text_lat.setText("Latitude: " + lat);
                 text_latLng.setText("(" + lat + "," + lng + ")");
@@ -303,7 +327,7 @@ public class ProDashboardReal extends AppCompatActivity {
         String stringSpeed= String.valueOf(speed.intValue());
         text_speed.setText("speed: " + stringSpeed);
         circleProgressView_speed.setValue(speed.intValue());
-        circleProgressView_speed.setText(stringSpeed);
+        circleProgressView_speed.setText(stringSpeed+"KM/H");
         String stringDegree= Float.toString(degree);
         text_degree.setText(stringDegree);
 
@@ -443,6 +467,19 @@ public class ProDashboardReal extends AppCompatActivity {
         } else {
             return true;
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //set LocationManager
+        checkLocationPermission();
+        if (mLocationManager == null) {
+            mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        }
+        mLocationListener = new MyLocationListener();
+        mLocationManager.requestLocationUpdates(LM_GPS, 0, 0, mLocationListener);
+        mLocationManager.requestLocationUpdates(LM_NETWORK, 0, 0, mLocationListener);
     }
 
     @Override
